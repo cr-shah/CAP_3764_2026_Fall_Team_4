@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+.env
+.venv/
+venv/
+
+# Raw datasets are downloaded locally and are not committed.
+data/raw/*.csv
+data/raw/*.xlsx
