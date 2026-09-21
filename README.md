@@ -39,7 +39,7 @@ Repository initialized. Data exploration, preprocessing, modeling, evaluation, a
 - Chaitanya Raj Shah
 - Naw Lin Lun Nway
 - Param Patel
-- Additional team members will be added.
+- Abhiram
 
 ## Course
 
