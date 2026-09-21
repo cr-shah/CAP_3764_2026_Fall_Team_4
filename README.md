@@ -17,7 +17,7 @@ The dataset is not included in this repository. It should be downloaded from the
 ## Repository Structure
 
 ```text
-CAP_3764_2026_Fall_Team_2/
+CAP_3764_2026_Fall_Team_4/
 ├── data/
 │   ├── raw/          # Original data (not tracked by Git)
 │   └── processed/    # Cleaned or transformed data added later
