@@ -1,8 +1,12 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent 
 
-def get_train_test(path="../data/processed/dataco_clean.csv"):
+def get_train_test(path=None):
+    if path is None:
+        path = ROOT / "data" / "processed" / "dataco_clean.csv"
     # Load the processed data
     processed_data = pd.read_csv(path, parse_dates=["order date (DateOrders)"])
 
