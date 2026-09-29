@@ -9,3 +9,7 @@ venv/
 # Raw datasets are downloaded locally and are not committed.
 data/raw/*.csv
 data/raw/*.xlsx
+
+models/
+data/raw/*.csv
+data/processed/*.csv
