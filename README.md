@@ -2,37 +2,88 @@
 
 ## Overview
 
-This repository contains a CAP 3764 Fall 2026 machine learning team project examining late-delivery risk in supply chain operations.
+This repository contains a CAP 3764 Fall 2026 team project examining
+late-delivery risk in supply-chain operations. The current reproducible
+foundation covers data loading, validation, deterministic cleaning, privacy, and
+future leakage protection. Exploratory analysis and modeling are separate later
+workstreams.
 
 ## Problem Statement
 
-The project aims to develop a classification model that predicts whether an order is at risk of late delivery and to examine which order, shipping, product, and geographic factors are associated with delivery delays. The project is in its initial setup stage; no analysis or modeling results are available yet.
+The eventual goal is to estimate whether an order is at risk of late delivery
+using information available at or near order/fulfillment decision time. The
+dataset contains order-item rows, so future evaluation must keep all items from
+the same order in the same data partition.
 
 ## Dataset
 
-The project will use the [DataCo Smart Supply Chain for Big Data Analysis](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis) dataset. It contains approximately 180,000 order-level observations covering customer, product, sales, order, shipping, and delivery information, including a binary late-delivery-risk outcome.
+Download the
+[DataCo Smart Supply Chain for Big Data Analysis](https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis)
+dataset. Place these files in `data/raw/`:
 
-The dataset is not included in this repository. It should be downloaded from the original Kaggle source and placed in `data/raw/` for local use.
+- `DataCoSupplyChainDataset.csv` — required raw data, kept local and ignored by Git
+- `DescriptionDataCoSupplyChain.csv` — small tracked data dictionary
+
+The expected raw file contains 180,519 order-item observations and 65,752
+unique orders. See [Data Preprocessing](docs/DATA_PREPROCESSING.md) for the
+verified checksum, encoding, cleaning decisions, and reproducibility details.
+
+## Environment
+
+Create the shared Python 3.11 Conda environment from the repository root:
+
+```bash
+conda env create -f environment.yml
+conda activate cap3764-team4
+```
+
+## Preprocessing
+
+Generate the local cleaned dataset with:
+
+```bash
+python -m src.preprocessing
+```
+
+This reads the immutable raw file using Latin-1 encoding and writes
+`data/processed/dataco_clean.csv`. Generated processed files are ignored by Git.
+The workflow performs no EDA, learned imputation, encoding, scaling, data
+splitting, or modeling.
+
+The companion notebook, `notebooks/01_data_preprocessing.ipynb`, demonstrates
+the same preprocessing decisions without charts or predictive analysis.
+
+Run the automated checks with:
+
+```bash
+pytest -q
+```
+
+Feature eligibility and leakage rules are documented in
+[Feature Policy](docs/FEATURE_POLICY.md).
 
 ## Repository Structure
 
 ```text
 CAP_3764_2026_Fall_Team_4/
 ├── data/
-│   ├── raw/          # Original data (not tracked by Git)
-│   └── processed/    # Cleaned or transformed data added later
-├── notebooks/        # Future analysis notebooks
-├── src/              # Future reusable project code
-├── reports/
-│   └── figures/      # Future visualizations and figures
-├── .gitignore
+│   ├── raw/          # Local immutable source data and tracked data dictionary
+│   └── processed/    # Locally generated, ignored cleaned data
+├── docs/             # Preprocessing and feature-policy documentation
+├── notebooks/        # Preprocessing and teammate analysis notebooks
+├── reports/figures/  # Generated analysis/modeling figures
+├── src/              # Reusable loading, validation, cleaning, and guardrails
+├── tests/            # Synthetic-data unit tests
+├── environment.yml
 ├── LICENSE
 └── README.md
 ```
 
 ## Project Status
 
-Repository initialized. Data exploration, preprocessing, modeling, evaluation, and interpretation will be added as the project progresses.
+The deterministic preprocessing foundation is implemented locally. Phase 1 EDA
+and later modeling/evaluation remain separate work and are not claimed complete
+here.
 
 ## Team
 
