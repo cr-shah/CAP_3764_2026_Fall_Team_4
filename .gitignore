@@ -1,15 +1,18 @@
 __pycache__/
 *.pyc
+.pytest_cache/
 .ipynb_checkpoints/
 .DS_Store
 .env
 .venv/
 venv/
 
-# Raw datasets are downloaded locally and are not committed.
-data/raw/*.csv
+# The large raw dataset is downloaded locally and is not committed.
+data/raw/DataCoSupplyChainDataset.csv
 data/raw/*.xlsx
 
 models/
-data/raw/*.csv
-data/processed/*.csv
+
+# Generated processed data is reproducible and remains local.
+data/processed/*
+!data/processed/.gitkeep

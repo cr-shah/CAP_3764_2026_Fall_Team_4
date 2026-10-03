@@ -1,0 +1,13 @@
+name: cap3764-team4
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas=2.2
+  - numpy=2.1
+  - scikit-learn=1.5
+  - matplotlib=3.9
+  - seaborn=0.13
+  - jupyterlab=4.2
+  - ipykernel=6.29
+  - pytest=8.3
