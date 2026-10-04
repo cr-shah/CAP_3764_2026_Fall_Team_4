@@ -3,10 +3,10 @@
 ## Overview
 
 This repository contains a CAP 3764 Fall 2026 team project examining
-late-delivery risk in supply-chain operations. The current reproducible
-foundation covers data loading, validation, deterministic cleaning, privacy, and
-future leakage protection. Exploratory analysis and modeling are separate later
-workstreams.
+late-delivery risk in supply-chain operations. The current reproducible work
+covers data loading, validation, deterministic cleaning, privacy, future
+leakage protection, and Phase 1 numerical and categorical exploratory analysis.
+Modeling and evaluation remain separate later workstreams.
 
 ## Problem Statement
 
@@ -62,6 +62,21 @@ pytest -q
 Feature eligibility and leakage rules are documented in
 [Feature Policy](docs/FEATURE_POLICY.md).
 
+## Exploratory Analysis
+
+The Phase 1 exploratory analysis uses the cleaned order-item dataset and is
+split across two notebooks:
+
+- `notebooks/02_numerical_eda.ipynb` examines numerical distributions,
+  shipping-duration patterns, outcome comparisons, correlations, and outliers.
+- `notebooks/03_categorical_eda.ipynb` examines categorical volumes and
+  late-delivery rates, including geographic, product, shipping-mode, and
+  leakage-focused views.
+
+Generated charts are stored under `reports/figures/numerical/` and
+`reports/figures/categorical/`. The findings are descriptive associations, not
+causal claims or evidence that a field is eligible for predictive modeling.
+
 ## Repository Structure
 
 ```text
@@ -81,9 +96,8 @@ CAP_3764_2026_Fall_Team_4/
 
 ## Project Status
 
-The deterministic preprocessing foundation is implemented locally. Phase 1 EDA
-and later modeling/evaluation remain separate work and are not claimed complete
-here.
+The deterministic preprocessing foundation and Phase 1 numerical and
+categorical EDA are implemented. Modeling and evaluation remain future work.
 
 ## Team
 
