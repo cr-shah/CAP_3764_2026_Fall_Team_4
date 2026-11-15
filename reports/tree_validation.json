@@ -1,0 +1,132 @@
+{
+  "source": {
+    "filename": "DataCoSupplyChainDataset.csv",
+    "size_bytes": 95729629,
+    "sha256": "994b3c8d24049cc46bf20e8161fedece9a9b95376cc0dc929921d76cf6b9bc0d",
+    "encoding": "latin-1"
+  },
+  "target": "late_delivery_risk",
+  "positive_class": 1,
+  "prediction_time": "order_placement",
+  "model_features": [
+    "days_for_shipment_scheduled",
+    "shipping_mode"
+  ],
+  "feature_policy": "same explicit allowlist and exclusions as PR #8",
+  "split": {
+    "manifest_sha256": "7fbeb2d5b8f8c4e439166adb9c9a6195b34b872361707cde1221667774d08aaa",
+    "partitions": {
+      "train": {
+        "rows": 118245,
+        "orders": 39451,
+        "first_order_timestamp": "2015-01-01T00:00:00",
+        "last_order_timestamp": "2016-11-21T09:32:00"
+      },
+      "validation": {
+        "rows": 39496,
+        "orders": 13150,
+        "first_order_timestamp": "2016-11-21T10:14:00",
+        "last_order_timestamp": "2017-07-09T22:53:00"
+      },
+      "test": {
+        "rows": 22778,
+        "orders": 13151,
+        "first_order_timestamp": "2017-07-09T23:14:00",
+        "last_order_timestamp": "2018-01-31T23:38:00"
+      }
+    },
+    "overlapping_order_counts": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    }
+  },
+  "reference_contract_verified": true,
+  "model": {
+    "estimator": "DecisionTreeClassifier",
+    "parameters": {
+      "ccp_alpha": 0.0,
+      "class_weight": null,
+      "criterion": "gini",
+      "max_depth": 3,
+      "max_features": null,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 100,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "random_state": 42,
+      "splitter": "best"
+    },
+    "fit_partition": "train",
+    "hyperparameter_search": "none; one fixed baseline configuration",
+    "achieved_depth": 3,
+    "leaves": 4,
+    "rules": "|--- scheduled_days__days_for_shipment_scheduled <= 3.0000\n|   |--- shipping_service__shipping_mode_Same Day <= 0.5000\n|   |   |--- shipping_service__shipping_mode_Second Class <= 0.5000\n|   |   |   |--- weights: [798.0000, 17465.0000] class: 1\n|   |   |--- shipping_service__shipping_mode_Second Class >  0.5000\n|   |   |   |--- weights: [5363.0000, 17857.0000] class: 1\n|   |--- shipping_service__shipping_mode_Same Day >  0.5000\n|   |   |--- weights: [3587.0000, 2813.0000] class: 0\n|--- scheduled_days__days_for_shipment_scheduled >  3.0000\n|   |--- weights: [43520.0000, 26842.0000] class: 0\n"
+  },
+  "preprocessing": {
+    "fit_partition": "train",
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot; ignore unknown categories",
+    "scaling": "none"
+  },
+  "validation_comparison": [
+    {
+      "model": "always_predict_late",
+      "partition": "validation",
+      "unit": "order_item",
+      "primary_metric": "average_precision",
+      "class_counts": {
+        "not_late_0": 17986,
+        "late_1": 21510
+      },
+      "late_prevalence": 0.5446121126189994,
+      "average_precision": 0.5446121126189994,
+      "precision": 0.5446121126189994,
+      "recall": 1.0,
+      "f1": 0.7051765400124578,
+      "accuracy": 0.5446121126189994,
+      "alert_rate": 1.0,
+      "confusion_counts": {
+        "tn": 0,
+        "fp": 17986,
+        "fn": 0,
+        "tp": 21510
+      },
+      "constant_score": 1.0,
+      "decision_rule": "alert on every item; no threshold selected or tuned"
+    },
+    {
+      "model": "shallow_decision_tree",
+      "partition": "validation",
+      "unit": "order_item",
+      "primary_metric": "average_precision",
+      "average_precision": 0.7420000295494212,
+      "precision": 0.841938572585991,
+      "recall": 0.5314272431427243,
+      "f1": 0.6515803573973267,
+      "accuracy": 0.6904749848085883,
+      "alert_rate": 0.3437563297549119,
+      "confusion_counts": {
+        "tn": 15840,
+        "fp": 2146,
+        "fn": 10079,
+        "tp": 11431
+      },
+      "alert_threshold": 0.5,
+      "threshold_selected_on_validation": false,
+      "decision_rule": "positive-class probability >= 0.5; illustrative fixed operating point"
+    }
+  ],
+  "validation_average_precision_gain": 0.1973879169304218,
+  "final_test_evaluated": false,
+  "final_threshold_fixed": false,
+  "runtime": {
+    "python": "3.11.18",
+    "pandas": "2.2.3",
+    "numpy": "2.1.3",
+    "scikit_learn": "1.5.2"
+  }
+}
