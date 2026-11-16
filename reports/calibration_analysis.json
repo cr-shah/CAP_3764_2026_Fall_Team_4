@@ -1,0 +1,153 @@
+{
+  "configuration_id": "submission_2_final_depth_3_tree_threshold_050",
+  "configuration_sha256": "a7110749d19fcbb41d06ceaa97e065a6c6e6d0d564b2da1a5d4faf65219a3288",
+  "training_fitted_model_fingerprint": "02e9c0f389e8a06d811f09d0a7be7927",
+  "source_reports": {
+    "final_item_level": "reports/final_evaluation.json",
+    "supplemental_unique_order": "reports/order_level_evaluation.json"
+  },
+  "analysis_partition": "validation",
+  "unit_for_calibration": "order_item",
+  "calibration_method": "four observed frozen-score shipping profiles; item-weighted",
+  "confidence_intervals": "95% Wilson intervals for observed profile late rates",
+  "alert_threshold": 0.5,
+  "calibration_fit_performed": false,
+  "threshold_selection_performed": false,
+  "frozen_model_or_threshold_changed": false,
+  "calibration_metrics": {
+    "profiles": 4,
+    "items": 39496,
+    "late_items": 21510,
+    "observed_late_prevalence": 0.5446121126189994,
+    "mean_predicted_probability": 0.5466308073676694,
+    "mean_probability_minus_prevalence": 0.0020186947486700024,
+    "brier_score": 0.1983113879168506,
+    "prevalence_baseline_brier_score": 0.2480097594076697,
+    "brier_skill_score": 0.20038877344792982,
+    "expected_calibration_error": 0.005724503621922126,
+    "maximum_calibration_error": 0.031230420761670763
+  },
+  "validation_item_level_operating_context": {
+    "items": 39496,
+    "late_items": 21510,
+    "false_alerts": 2146,
+    "missed_late_items": 10079,
+    "total_alerts": 13577,
+    "true_alerts": 11431,
+    "correct_non_alerts": 15840,
+    "alert_rate": 0.3437563297549119
+  },
+  "unique_order_operational_context": {
+    "validation": {
+      "orders": 13150,
+      "late_orders": 7172,
+      "false_alerts": 692,
+      "missed_late_orders": 3336,
+      "total_alerts": 4528,
+      "true_alerts": 3836,
+      "correct_non_alerts": 5286
+    },
+    "test": {
+      "orders": 13151,
+      "late_orders": 7228,
+      "false_alerts": 698,
+      "missed_late_orders": 3345,
+      "total_alerts": 4581,
+      "true_alerts": 3883,
+      "correct_non_alerts": 5225
+    }
+  },
+  "profile_results": [
+    {
+      "partition": "validation",
+      "shipping_mode": "Same Day",
+      "days_for_shipment_scheduled": 0,
+      "items": 2035,
+      "late_items": 958,
+      "item_share": 0.05152420498278307,
+      "predicted_late_probability": 0.43953125,
+      "observed_late_rate": 0.47076167076167075,
+      "calibration_gap": 0.031230420761670763,
+      "absolute_calibration_gap": 0.031230420761670763,
+      "observed_rate_ci95_lower": 0.4491501040038348,
+      "observed_rate_ci95_upper": 0.49248341965979847,
+      "profile_brier_score": 0.2501204592843021,
+      "alerts": false,
+      "true_alerts": 0,
+      "false_alerts": 0,
+      "missed_late_items": 958,
+      "correct_non_alerts": 1077
+    },
+    {
+      "partition": "validation",
+      "shipping_mode": "First Class",
+      "days_for_shipment_scheduled": 1,
+      "items": 6102,
+      "late_items": 5780,
+      "item_share": 0.15449665788940653,
+      "predicted_late_probability": 0.9563050977385972,
+      "observed_late_rate": 0.9472304162569649,
+      "calibration_gap": -0.009074681481632263,
+      "absolute_calibration_gap": 0.009074681481632263,
+      "observed_rate_ci95_lower": 0.9413340435093831,
+      "observed_rate_ci95_upper": 0.9525640228931256,
+      "profile_brier_score": 0.05006730461861496,
+      "alerts": true,
+      "true_alerts": 5780,
+      "false_alerts": 322,
+      "missed_late_items": 0,
+      "correct_non_alerts": 0
+    },
+    {
+      "partition": "validation",
+      "shipping_mode": "Second Class",
+      "days_for_shipment_scheduled": 2,
+      "items": 7475,
+      "late_items": 5651,
+      "item_share": 0.18925967186550538,
+      "predicted_late_probability": 0.7690353143841516,
+      "observed_late_rate": 0.7559866220735786,
+      "calibration_gap": -0.01304869231057304,
+      "absolute_calibration_gap": 0.01304869231057304,
+      "observed_rate_ci95_lower": 0.7461199869984348,
+      "observed_rate_ci95_upper": 0.765590275724605,
+      "profile_brier_score": 0.18464111769037483,
+      "alerts": true,
+      "true_alerts": 5651,
+      "false_alerts": 1824,
+      "missed_late_items": 0,
+      "correct_non_alerts": 0
+    },
+    {
+      "partition": "validation",
+      "shipping_mode": "Standard Class",
+      "days_for_shipment_scheduled": 4,
+      "items": 23884,
+      "late_items": 9121,
+      "item_share": 0.604719465262305,
+      "predicted_late_probability": 0.3814843239248458,
+      "observed_late_rate": 0.38188745603751467,
+      "calibration_gap": 0.00040313211266884696,
+      "absolute_calibration_gap": 0.00040313211266884696,
+      "observed_rate_ci95_lower": 0.3757451677159484,
+      "observed_rate_ci95_upper": 0.38806773365560115,
+      "profile_brier_score": 0.23604958947421023,
+      "alerts": false,
+      "true_alerts": 0,
+      "false_alerts": 0,
+      "missed_late_items": 9121,
+      "correct_non_alerts": 14763
+    }
+  ],
+  "figures": {
+    "reliability": "reports/figures/calibration/validation_reliability.png",
+    "error_burden": "reports/figures/calibration/validation_error_burden.png"
+  },
+  "permitted_use": "validation-only diagnostic reporting; no calibration fit, model selection, feature change, or threshold change",
+  "runtime": {
+    "python": "3.11.18",
+    "pandas": "2.2.3",
+    "numpy": "2.1.3",
+    "matplotlib": "3.9.4"
+  }
+}
