@@ -119,6 +119,27 @@ python -m src.final_evaluation
 python -m src.order_level_evaluation
 ```
 
+## Final Report
+
+The executive summary is
+[`reports/executive_summary_report.docx`](reports/executive_summary_report.docx),
+a filled copy of the instructor template (585 words of report text, excluding
+table cells and captions). Its source text, number provenance, and integrated
+teammate findings are in [Executive Summary Source](docs/EXECUTIVE_SUMMARY_SOURCE.md).
+
+The three report figures are drawn only from tracked JSON/CSV reports; no
+customer data is read and no model is fitted:
+
+```bash
+python -m src.final_visuals
+```
+
+| Figure | Shows |
+|---|---|
+| `reports/figures/final/fig1_model_comparison.png` | Validation AP tie among tuned models and the frozen final-test result |
+| `reports/figures/final/fig2_alert_policy_tradeoff.png` | Validation precision/recall for each alert policy and the frozen 0.50 rule |
+| `reports/figures/final/fig3_profile_risk_and_errors.png` | Validation profile calibration and where false alerts and misses fall |
+
 ## Verification and Contributions
 
 Run the automated tests with:
@@ -151,10 +172,10 @@ CAP_3764_2026_Fall_Team_4/
 
 ## Project Status
 
-Preprocessing, Phase 1 EDA, Submission 2 modeling, and the frozen final
-evaluation are implemented. Current maintenance work focuses on reproducibility
-and repository safeguards; the course final report and presentation are not yet
-part of this repository-hardening scope.
+Preprocessing, Phase 1 EDA, Submission 2 modeling, the frozen final
+evaluation, calibration and error analysis, model interpretation, and the final
+executive summary with its figure package are complete. The final test has been
+examined and must not be used for further tuning.
 
 ## Team
 
