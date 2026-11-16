@@ -1,0 +1,86 @@
+{
+  "configuration_id": "submission_2_final_depth_3_tree_threshold_050",
+  "selection_basis": "Explicit final user instruction before held-out test scoring",
+  "frozen_before_test_scoring": true,
+  "target": "late_delivery_risk",
+  "positive_class": 1,
+  "features": [
+    "days_for_shipment_scheduled",
+    "shipping_mode"
+  ],
+  "estimator": "DecisionTreeClassifier",
+  "estimator_parameters": {
+    "ccp_alpha": 0.0,
+    "class_weight": null,
+    "criterion": "gini",
+    "max_depth": 3,
+    "max_features": null,
+    "max_leaf_nodes": null,
+    "min_impurity_decrease": 0.0,
+    "min_samples_leaf": 100,
+    "min_samples_split": 2,
+    "min_weight_fraction_leaf": 0.0,
+    "monotonic_cst": null,
+    "random_state": 42,
+    "splitter": "best"
+  },
+  "alert_threshold": 0.5,
+  "decision_rule": "late-class probability >= 0.50",
+  "fit_partition": "train",
+  "refit_with_validation": false,
+  "preprocessing": {
+    "fit_partition": "train",
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot; ignore unknown categories",
+    "scaling": "none"
+  },
+  "source_sha256": "994b3c8d24049cc46bf20e8161fedece9a9b95376cc0dc929921d76cf6b9bc0d",
+  "split": {
+    "manifest_sha256": "7fbeb2d5b8f8c4e439166adb9c9a6195b34b872361707cde1221667774d08aaa",
+    "partitions": {
+      "train": {
+        "rows": 118245,
+        "orders": 39451,
+        "first_order_timestamp": "2015-01-01T00:00:00",
+        "last_order_timestamp": "2016-11-21T09:32:00"
+      },
+      "validation": {
+        "rows": 39496,
+        "orders": 13150,
+        "first_order_timestamp": "2016-11-21T10:14:00",
+        "last_order_timestamp": "2017-07-09T22:53:00"
+      },
+      "test": {
+        "rows": 22778,
+        "orders": 13151,
+        "first_order_timestamp": "2017-07-09T23:14:00",
+        "last_order_timestamp": "2018-01-31T23:38:00"
+      }
+    },
+    "overlapping_order_counts": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    }
+  },
+  "implementation_sha256": {
+    "src/data_loader.py": "c5d551be8b13acae9b6d45b69a2d9164f850a73877c00c661338e848ea06484f",
+    "src/data_validation.py": "61781998f1a3b99dd3da525555aee815c04a51e00c57b048b791756b8cf3bd9b",
+    "src/preprocessing.py": "50a570b310ca394d929e45a62cc89cb2625c4a13b98528b8f9b29bfbeea10d57",
+    "src/leakage_guardrails.py": "8e7c0442a97b96e351f282b7f74a3db71a55e7252b394d63ac72f228c8471622",
+    "src/baseline_evaluation.py": "9c137e22aa9bf39ef7ae939e9153451d1a977ecc9e6a6ae70d1f1dc7baa1e11b",
+    "src/tree_evaluation.py": "bf8f4be109f18a1a80de311da728b8a26c76187dcd5eafd06640c805979fdc45",
+    "src/final_evaluation.py": "374541dbf64a31f9325e9749eb4c6fce6893a25b7b5bc62f081c4b65f95e9730"
+  },
+  "reference_report_sha256": {
+    "reports/always_late_validation.json": "8e5d8a51608b768b064093f2f94f1c6e68d2449b00b3a70e81d8aaf9fe0d99da",
+    "reports/tree_validation.json": "4569e3696a256b005ae9695ba4b046ed69121aa6d0bb2b354062b2b74b4dfab8",
+    "reports/validation_alert_policies.json": "f90e6b4cd69a67f722fd0e740ea6a1f91bfdae8e106c3c4c3dd76109834367d8"
+  },
+  "test_use": "final reporting only; no model, feature, preprocessing, or threshold changes after test results",
+  "selection_date": "2026-11-15",
+  "content_hash_convention": "UTF-8 text normalized to LF for code/config/reference reports; raw bytes for source CSV",
+  "baseline_report_path": "reports/always_late_validation.json",
+  "tree_report_path": "reports/tree_validation.json"
+}
