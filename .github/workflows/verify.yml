@@ -1,0 +1,56 @@
+name: Verify repository
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Create exact Conda environment
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          activate-environment: cap3764-team4
+          environment-file: environment.yml
+          miniforge-version: latest
+          conda-solver: libmamba
+
+      - name: Check changed files for whitespace errors
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            git diff --check "$BASE_SHA...$HEAD_SHA"
+          else
+            git diff --check "$BEFORE_SHA" "$HEAD_SHA"
+          fi
+
+      - name: Validate tracked JSON artifacts
+        run: >-
+          python -c "import json, pathlib;
+          paths = list(pathlib.Path('notebooks').glob('*.ipynb')) +
+          list(pathlib.Path('reports').glob('*.json'));
+          [json.loads(path.read_text(encoding='utf-8')) for path in paths];
+          print(f'validated {len(paths)} JSON files')"
+
+      - name: Run test suite
+        run: pytest -q

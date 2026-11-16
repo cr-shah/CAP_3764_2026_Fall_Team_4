@@ -1,0 +1,3 @@
+model,partition,unit,post_hoc_supplemental,orders,late_orders,late_prevalence,threshold,average_precision,precision,recall,false_alerts,missed_late_orders,total_alerts,true_alerts,correct_non_alerts,alert_rate
+frozen_depth_3_tree,validation,unique_order,True,13150,7172,0.545399239544,0.500000000000,0.745602803030,0.847173144876,0.534857780257,692,3336,4528,3836,5286,0.344334600760
+frozen_depth_3_tree,test,unique_order,True,13151,7228,0.549615998783,0.500000000000,0.749332221946,0.847631521502,0.537216380742,698,3345,4581,3883,5225,0.348338529389
