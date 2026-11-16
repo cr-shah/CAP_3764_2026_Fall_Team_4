@@ -87,7 +87,7 @@
   "post_hoc_supplemental": true,
   "permitted_use": "reporting only; no model, feature, preprocessing, or threshold changes",
   "runtime": {
-    "python": "3.11.16",
+    "python": "3.11.18",
     "pandas": "2.2.3",
     "numpy": "2.1.3",
     "scikit_learn": "1.5.2"

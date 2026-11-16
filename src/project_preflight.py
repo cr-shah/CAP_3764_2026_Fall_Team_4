@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+from importlib import import_module
 from importlib import metadata
 import json
 from pathlib import Path
@@ -17,18 +18,21 @@ from .data_loader import DEFAULT_RAW_DATA_PATH
 from .preprocessing import DEFAULT_PROCESSED_DATA_PATH
 
 
-REQUIRED_DISTRIBUTIONS = (
-    "pandas",
-    "numpy",
-    "scikit-learn",
-    "matplotlib",
-    "seaborn",
-    "scipy",
-    "pytest",
-    "jupyterlab",
-    "ipykernel",
-    "plotly",
-)
+EXPECTED_RUNTIME_VERSIONS = {
+    "pandas": "2.2.3",
+    "numpy": "2.1.3",
+    "scikit-learn": "1.5.2",
+    "matplotlib": "3.9.4",
+    "seaborn": "0.13.2",
+    "scipy": "1.17.1",
+    "pytest": "8.3.5",
+    "jupyterlab": "4.2.7",
+    "ipykernel": "6.29.5",
+    "plotly": "5.24.1",
+}
+IMPORT_NAMES = {"scikit-learn": "sklearn"}
+EXPECTED_PYTHON_VERSION = "3.11.18"
+REQUIRED_DISTRIBUTIONS = tuple(EXPECTED_RUNTIME_VERSIONS)
 PROCESSED_REQUIRED_COLUMNS = frozenset({"order_id", "late_delivery_risk"})
 
 
@@ -143,29 +147,66 @@ def inspect_processed_file(path: Path) -> dict[str, Any]:
 
 
 def inspect_runtime() -> dict[str, Any]:
-    """Report Python and required distribution versions without importing them."""
+    """Verify the declared Python/packages are installed, exact, and importable."""
     packages: dict[str, dict[str, Any]] = {}
     for distribution in REQUIRED_DISTRIBUTIONS:
+        expected = EXPECTED_RUNTIME_VERSIONS[distribution]
         try:
             version = metadata.version(distribution)
         except metadata.PackageNotFoundError:
-            packages[distribution] = {"installed": False, "version": None}
+            packages[distribution] = {
+                "installed": False,
+                "version": None,
+                "expected_version": expected,
+                "matches_expected": False,
+                "importable": False,
+                "import_error": "distribution is not installed",
+            }
         else:
-            packages[distribution] = {"installed": True, "version": version}
+            try:
+                import_module(IMPORT_NAMES.get(distribution, distribution))
+            except Exception as error:
+                importable = False
+                import_error = f"{type(error).__name__}: {error}"
+            else:
+                importable = True
+                import_error = None
+            packages[distribution] = {
+                "installed": True,
+                "version": version,
+                "expected_version": expected,
+                "matches_expected": version == expected,
+                "importable": importable,
+                "import_error": import_error,
+            }
+    python_version = platform.python_version()
     return {
-        "python": {"installed": True, "version": platform.python_version()},
+        "python": {
+            "installed": True,
+            "version": python_version,
+            "expected_version": EXPECTED_PYTHON_VERSION,
+            "matches_expected": python_version == EXPECTED_PYTHON_VERSION,
+        },
         "packages": packages,
-        "ok": all(value["installed"] for value in packages.values()),
+        "ok": (
+            python_version == EXPECTED_PYTHON_VERSION
+            and all(
+                value["installed"] and value["matches_expected"] and value["importable"]
+                for value in packages.values()
+            )
+        ),
     }
 
 
 def run_preflight(
-    raw_path: Path = DEFAULT_RAW_DATA_PATH,
-    processed_path: Path = DEFAULT_PROCESSED_DATA_PATH,
+    raw_path: Path | None = None,
+    processed_path: Path | None = None,
 ) -> dict[str, Any]:
     """Run all read-only project checks and return one machine-readable result."""
-    raw_data = inspect_raw_file(Path(raw_path), EXPECTED_RAW_SHA256)
-    processed_data = inspect_processed_file(Path(processed_path))
+    raw_source = DEFAULT_RAW_DATA_PATH if raw_path is None else Path(raw_path)
+    processed_source = DEFAULT_PROCESSED_DATA_PATH if processed_path is None else Path(processed_path)
+    raw_data = inspect_raw_file(raw_source, EXPECTED_RAW_SHA256)
+    processed_data = inspect_processed_file(processed_source)
     runtime = inspect_runtime()
     return {
         "ok": all(check["ok"] for check in (raw_data, processed_data, runtime)),

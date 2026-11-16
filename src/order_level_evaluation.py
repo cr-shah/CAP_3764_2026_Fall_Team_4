@@ -41,6 +41,15 @@ DEFAULT_REPORT_PATH = REPOSITORY_ROOT / "reports" / "order_level_evaluation.json
 DEFAULT_TABLE_PATH = REPOSITORY_ROOT / "reports" / "order_level_evaluation.csv"
 
 
+def report_path_label(path: str | Path) -> str:
+    """Prefer a repository-relative artifact label, with an external-path fallback."""
+    resolved = Path(path).resolve()
+    try:
+        return str(resolved.relative_to(REPOSITORY_ROOT))
+    except ValueError:
+        return str(resolved)
+
+
 def aggregate_orders(data: pd.DataFrame, scores: np.ndarray) -> pd.DataFrame:
     """Collapse item rows after proving all evaluated fields agree per order."""
     required = {ORDER_ID, TARGET_COLUMN, ORDER_TIMESTAMP, *MODEL_FEATURES}
@@ -133,15 +142,31 @@ def verify_tracked_item_results(
     if not tracked_report.get("model_and_configuration_unchanged_after_scoring"):
         raise ValueError("Tracked final report does not guarantee an unchanged model.")
 
-    integer_fields = (
+    expected_partitions = {"validation", "test"}
+    reproduced_partitions = {row.get("partition") for row in reproduced_rows}
+    if reproduced_partitions != expected_partitions or len(reproduced_rows) != 2:
+        raise ValueError("Reproduced item-level partition set must be validation and test.")
+
+    exact_fields = (
+        "model",
+        "partition",
+        "unit",
         "items",
         "late_items",
         "false_alerts",
         "missed_late_items",
+        "total_alerts",
         "true_alerts",
         "correct_non_alerts",
     )
-    metric_fields = ("average_precision", "precision", "recall")
+    metric_fields = (
+        "late_prevalence",
+        "threshold",
+        "average_precision",
+        "precision",
+        "recall",
+        "alert_rate",
+    )
     tracked_rows = {
         (row["model"], row["partition"]): row
         for row in tracked_report.get("results", [])
@@ -153,7 +178,9 @@ def verify_tracked_item_results(
         partition = current.get("partition", "unknown")
         if previous is None:
             raise ValueError(f"Tracked {partition} item-level result is missing.")
-        for field in integer_fields:
+        if set(current) != set(previous):
+            raise ValueError(f"Reproduced {partition} result fields differ from the tracked result.")
+        for field in exact_fields:
             if current.get(field) != previous.get(field):
                 raise ValueError(f"Reproduced {partition} {field} differs from the tracked result.")
         for field in metric_fields:
@@ -225,7 +252,7 @@ def run_order_level_evaluation(
         "model_features": list(MODEL_FEATURES),
         "alert_threshold": threshold,
         "training_fitted_model_fingerprint": fingerprint,
-        "tracked_item_level_report": str(tracked_path.relative_to(REPOSITORY_ROOT)),
+        "tracked_item_level_report": report_path_label(tracked_path),
         "tracked_item_level_results_reproduced": True,
         "results": results,
         "post_hoc_supplemental": True,

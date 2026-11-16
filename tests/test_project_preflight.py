@@ -9,6 +9,8 @@ from pathlib import Path
 import pandas as pd
 
 from src.project_preflight import (
+    EXPECTED_PYTHON_VERSION,
+    EXPECTED_RUNTIME_VERSIONS,
     inspect_processed_file,
     inspect_raw_file,
     inspect_runtime,
@@ -94,9 +96,19 @@ def test_processed_file_requires_order_id_and_target_headers(tmp_path: Path) -> 
     assert result["missing_columns"] == ["late_delivery_risk"]
 
 
-def test_runtime_reports_every_required_package_and_version() -> None:
+def test_runtime_reports_every_required_package_and_version(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "src.project_preflight.platform.python_version", lambda: EXPECTED_PYTHON_VERSION
+    )
+    monkeypatch.setattr(
+        "src.project_preflight.metadata.version",
+        lambda distribution: EXPECTED_RUNTIME_VERSIONS[distribution],
+    )
+    monkeypatch.setattr("src.project_preflight.import_module", lambda name: object())
+
     result = inspect_runtime()
 
+    assert result["ok"] is True
     assert result["python"]["installed"] is True
     assert result["python"]["version"]
     for package in [
@@ -112,7 +124,52 @@ def test_runtime_reports_every_required_package_and_version() -> None:
         "plotly",
     ]:
         assert package in result["packages"]
-        assert set(result["packages"][package]) == {"installed", "version"}
+        assert set(result["packages"][package]) == {
+            "installed",
+            "version",
+            "expected_version",
+            "matches_expected",
+            "importable",
+            "import_error",
+        }
+
+
+def test_runtime_requires_declared_versions_and_successful_imports(monkeypatch) -> None:
+    monkeypatch.setattr("src.project_preflight.platform.python_version", lambda: "3.11.18")
+    monkeypatch.setattr(
+        "src.project_preflight.metadata.version",
+        lambda distribution: {
+            "pandas": "2.2.3",
+            "numpy": "2.1.3",
+            "scikit-learn": "1.5.2",
+            "matplotlib": "3.9.4",
+            "seaborn": "0.13.2",
+            "scipy": "1.17.1",
+            "pytest": "8.3.5",
+            "jupyterlab": "4.2.7",
+            "ipykernel": "6.29.5",
+            "plotly": "5.24.1",
+        }[distribution],
+    )
+    monkeypatch.setattr("src.project_preflight.import_module", lambda name: object())
+
+    assert inspect_runtime()["ok"] is True
+
+    monkeypatch.setattr("src.project_preflight.metadata.version", lambda distribution: "0.0.0")
+    mismatched = inspect_runtime()
+    assert mismatched["ok"] is False
+    assert mismatched["packages"]["pandas"]["matches_expected"] is False
+
+    def broken_import(name: str) -> object:
+        if name == "pandas":
+            raise ImportError("broken binary")
+        return object()
+
+    monkeypatch.setattr("src.project_preflight.import_module", broken_import)
+    unimportable = inspect_runtime()
+    assert unimportable["ok"] is False
+    assert unimportable["packages"]["pandas"]["importable"] is False
+    assert "broken binary" in unimportable["packages"]["pandas"]["import_error"]
 
 
 def test_run_preflight_combines_check_statuses(monkeypatch, tmp_path: Path) -> None:
@@ -133,6 +190,30 @@ def test_run_preflight_combines_check_statuses(monkeypatch, tmp_path: Path) -> N
     assert result["ok"] is True
     assert result["raw_data"]["status"] == "ok"
     assert result["processed_data"]["status"] == "ok"
+
+
+def test_run_preflight_none_paths_use_project_defaults(monkeypatch) -> None:
+    seen = {}
+
+    def inspect_raw(path: Path, expected: str) -> dict:
+        seen["raw"] = path
+        return {"ok": True}
+
+    def inspect_processed(path: Path) -> dict:
+        seen["processed"] = path
+        return {"ok": True}
+
+    monkeypatch.setattr("src.project_preflight.inspect_raw_file", inspect_raw)
+    monkeypatch.setattr("src.project_preflight.inspect_processed_file", inspect_processed)
+    monkeypatch.setattr(
+        "src.project_preflight.inspect_runtime",
+        lambda: {"python": {}, "packages": {}, "ok": True},
+    )
+
+    run_preflight(None, None)
+
+    assert seen["raw"] == Path("data/raw/DataCoSupplyChainDataset.csv").resolve()
+    assert seen["processed"] == Path("data/processed/dataco_clean.csv").resolve()
 
 
 def test_cli_returns_nonzero_and_prints_json_for_failed_preflight(

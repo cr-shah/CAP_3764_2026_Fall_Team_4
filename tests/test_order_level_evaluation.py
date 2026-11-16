@@ -8,6 +8,7 @@ import pytest
 
 from src.order_level_evaluation import (
     aggregate_orders,
+    report_path_label,
     score_orders,
     verify_tracked_item_results,
 )
@@ -128,13 +129,17 @@ def tracked_contract() -> tuple[dict, list[dict]]:
             "unit": "order_item",
             "items": 10,
             "late_items": 6,
+            "late_prevalence": 0.6,
+            "threshold": 0.5,
             "average_precision": 0.75,
             "precision": 0.8,
             "recall": 2 / 3,
             "false_alerts": 1,
             "missed_late_items": 2,
+            "total_alerts": 5,
             "true_alerts": 4,
             "correct_non_alerts": 3,
+            "alert_rate": 0.5,
         }
         for partition in ("validation", "test")
     ]
@@ -183,11 +188,25 @@ def test_tracked_item_contract_rejects_changed_fingerprint() -> None:
         )
 
 
-@pytest.mark.parametrize("field", ["items", "average_precision", "true_alerts"])
-def test_tracked_item_contract_rejects_changed_reproduced_result(field: str) -> None:
+@pytest.mark.parametrize(
+    "field,replacement",
+    [
+        ("unit", "unique_order"),
+        ("items", 11),
+        ("late_prevalence", 0.61),
+        ("threshold", 0.6),
+        ("average_precision", 0.76),
+        ("total_alerts", 6),
+        ("true_alerts", 5),
+        ("alert_rate", 0.6),
+    ],
+)
+def test_tracked_item_contract_rejects_changed_reproduced_result(
+    field: str, replacement: object
+) -> None:
     tracked, rows = tracked_contract()
     changed = [dict(row) for row in rows]
-    changed[0][field] += 1
+    changed[0][field] = replacement
 
     with pytest.raises(ValueError, match="validation"):
         verify_tracked_item_results(
@@ -197,3 +216,22 @@ def test_tracked_item_contract_rejects_changed_reproduced_result(field: str) -> 
             changed,
             tracked,
         )
+
+
+def test_tracked_item_contract_requires_validation_and_test_rows() -> None:
+    tracked, rows = tracked_contract()
+
+    with pytest.raises(ValueError, match="partition set"):
+        verify_tracked_item_results(
+            {"configuration_id": "frozen-tree"},
+            "config-hash",
+            "model-hash",
+            rows[:1],
+            tracked,
+        )
+
+
+def test_report_path_label_falls_back_for_external_contract(tmp_path) -> None:
+    external = tmp_path / "final.json"
+
+    assert report_path_label(external) == str(external.resolve())
