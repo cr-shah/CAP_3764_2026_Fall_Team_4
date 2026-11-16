@@ -231,6 +231,24 @@ def test_tracked_item_contract_requires_validation_and_test_rows() -> None:
         )
 
 
+@pytest.mark.parametrize("corruption", ["duplicate", "extra"])
+def test_tracked_item_contract_rejects_duplicate_or_extra_partitions(corruption: str) -> None:
+    tracked, rows = tracked_contract()
+    added = dict(rows[0])
+    if corruption == "extra":
+        added["partition"] = "future"
+    tracked["results"] = [added, *rows]
+
+    with pytest.raises(ValueError, match="Tracked item-level partition set"):
+        verify_tracked_item_results(
+            {"configuration_id": "frozen-tree"},
+            "config-hash",
+            "model-hash",
+            rows,
+            tracked,
+        )
+
+
 def test_report_path_label_falls_back_for_external_contract(tmp_path) -> None:
     external = tmp_path / "final.json"
 

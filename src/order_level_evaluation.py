@@ -167,10 +167,16 @@ def verify_tracked_item_results(
         "recall",
         "alert_rate",
     )
-    tracked_rows = {
-        (row["model"], row["partition"]): row
+    tracked_frozen_rows = [
+        row
         for row in tracked_report.get("results", [])
         if row.get("model") == "frozen_depth_3_tree"
+    ]
+    tracked_partitions = [row.get("partition") for row in tracked_frozen_rows]
+    if len(tracked_partitions) != 2 or set(tracked_partitions) != expected_partitions:
+        raise ValueError("Tracked item-level partition set must be unique validation and test rows.")
+    tracked_rows = {
+        (row["model"], row["partition"]): row for row in tracked_frozen_rows
     }
     for current in reproduced_rows:
         key = (current.get("model"), current.get("partition"))
