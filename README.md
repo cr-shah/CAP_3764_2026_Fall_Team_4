@@ -4,16 +4,18 @@
 
 This repository contains a CAP 3764 Fall 2026 team project examining
 late-delivery risk in supply-chain operations. The current reproducible work
-covers data loading, validation, deterministic cleaning, privacy, future
-leakage protection, and Phase 1 numerical and categorical exploratory analysis.
-Modeling and evaluation remain separate later workstreams.
+covers data loading, validation, deterministic cleaning, privacy and leakage
+protection, numerical and categorical exploratory analysis, chronological
+model validation, and a frozen final evaluation.
 
 ## Problem Statement
 
-The eventual goal is to estimate whether an order is at risk of late delivery
+The goal is to estimate whether an order is at risk of late delivery
 using information available at or near order/fulfillment decision time. The
-dataset contains order-item rows, so future evaluation must keep all items from
-the same order in the same data partition.
+dataset contains order-item rows, so every chronological partition keeps all
+items from the same order together. The approved model uses only scheduled
+shipping days and shipping mode; outcome-derived and post-order fields are
+excluded.
 
 ## Dataset
 
@@ -37,6 +39,17 @@ conda env create -f environment.yml
 conda activate cap3764-team4
 ```
 
+The environment file pins the exact versions used for repository verification.
+Check the local runtime and source-data integrity before running the pipeline:
+
+```bash
+python -m src.project_preflight
+```
+
+This diagnostic is read-only. It reports a missing or wrong raw file separately
+from the common case where the correct CSV was converted from LF to CRLF line
+endings.
+
 ## Preprocessing
 
 Generate the local cleaned dataset with:
@@ -52,12 +65,6 @@ splitting, or modeling.
 
 The companion notebook, `notebooks/01_data_preprocessing.ipynb`, demonstrates
 the same preprocessing decisions without charts or predictive analysis.
-
-Run the automated checks with:
-
-```bash
-pytest -q
-```
 
 Feature eligibility and leakage rules are documented in
 [Feature Policy](docs/FEATURE_POLICY.md).
@@ -77,6 +84,54 @@ Generated charts are stored under `reports/figures/numerical/` and
 `reports/figures/categorical/`. The findings are descriptive associations, not
 causal claims or evidence that a field is eligible for predictive modeling.
 
+## Modeling and Evaluation
+
+Submission 2 uses chronological, order-grouped train, validation, and final-test
+partitions. Validation work compared the always-late reference, a fixed shallow
+decision tree, alert policies, and a small training-only AutoML-style search.
+The recorded final choice is the depth-3 decision tree at a fixed 0.50 alert
+threshold, fitted on training data only.
+
+The frozen final-test item-level result is:
+
+| Unit | Rows/orders | Average precision | Precision | Recall |
+|---|---:|---:|---:|---:|
+| Order item | 22,778 | 0.749683 | 84.65% | 54.02% |
+| Unique order (supplemental) | 13,151 | 0.749332 | 84.76% | 53.72% |
+
+The unique-order row is a post-hoc reporting supplement that weights every
+`order_id` once. It reproduces the frozen item-level contract before aggregating
+predictions. See [Final Evaluation](docs/FINAL_EVALUATION.md) and
+[Supplemental Unique-Order Evaluation](docs/ORDER_LEVEL_EVALUATION.md).
+
+The final test has already been examined. Its results must not be used to tune
+the model, features, preprocessing, or threshold. A future candidate requires a
+new protocol with an untouched test set.
+
+To reproduce the tracked evaluation artifacts after preflight succeeds:
+
+```bash
+python -m src.baseline_evaluation
+python -m src.tree_evaluation
+python -m src.alert_policy_evaluation
+python -m src.automl_evaluation
+python -m src.final_evaluation
+python -m src.order_level_evaluation
+```
+
+## Verification and Contributions
+
+Run the automated tests with:
+
+```bash
+pytest -q
+```
+
+GitHub Actions runs the same suite and validates tracked notebook/report JSON on
+every pull request and push to `main`. Repository administrators should enable
+the settings in [Repository Guardrails](docs/REPOSITORY_GUARDRAILS.md) after the
+workflow succeeds so changes to `main` require a reviewed, green pull request.
+
 ## Repository Structure
 
 ```text
@@ -84,10 +139,10 @@ CAP_3764_2026_Fall_Team_4/
 ├── data/
 │   ├── raw/          # Local immutable source data and tracked data dictionary
 │   └── processed/    # Locally generated, ignored cleaned data
-├── docs/             # Preprocessing and feature-policy documentation
+├── docs/             # Workflow, policy, and evaluation documentation
 ├── notebooks/        # Preprocessing and teammate analysis notebooks
-├── reports/figures/  # Generated analysis/modeling figures
-├── src/              # Reusable loading, validation, cleaning, and guardrails
+├── reports/          # Tracked evaluation artifacts and generated figures
+├── src/              # Loading, validation, cleaning, modeling, and checks
 ├── tests/            # Synthetic-data unit tests
 ├── environment.yml
 ├── LICENSE
@@ -96,8 +151,10 @@ CAP_3764_2026_Fall_Team_4/
 
 ## Project Status
 
-The deterministic preprocessing foundation and Phase 1 numerical and
-categorical EDA are implemented. Modeling and evaluation remain future work.
+Preprocessing, Phase 1 EDA, Submission 2 modeling, and the frozen final
+evaluation are implemented. Current maintenance work focuses on reproducibility
+and repository safeguards; the course final report and presentation are not yet
+part of this repository-hardening scope.
 
 ## Team
 
