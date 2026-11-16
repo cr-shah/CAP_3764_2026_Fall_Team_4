@@ -1,0 +1,6 @@
+model,kind,validation_average_precision,inner_cv_average_precision,settings,distinct_scores,rank,partition,unit,gain_vs_always_late,gain_vs_depth_3_tree
+depth_3_tree,reference,0.742000029549,,"{""ccp_alpha"": 0.0, ""class_weight"": null, ""criterion"": ""gini"", ""max_depth"": 3, ""max_features"": null, ""max_leaf_nodes"": null, ""min_impurity_decrease"": 0.0, ""min_samples_leaf"": 100, ""min_samples_split"": 2, ""min_weight_fraction_leaf"": 0.0, ""monotonic_cst"": null, ""random_state"": 42, ""splitter"": ""best""}",4,1,validation,order_item,0.197387916930,0.000000000000
+logistic_regression,tuned_candidate,0.742000029549,0.754742226005,"{""model__C"": 0.1}",4,1,validation,order_item,0.197387916930,0.000000000000
+decision_tree,tuned_candidate,0.742000029549,0.754742226005,"{""model__max_depth"": 3}",4,1,validation,order_item,0.197387916930,0.000000000000
+random_forest,tuned_candidate,0.742000029549,0.754742226005,"{""model__max_depth"": 3}",4,1,validation,order_item,0.197387916930,0.000000000000
+always_predict_late,reference,0.544612112619,,{},1,5,validation,order_item,0.000000000000,-0.197387916930

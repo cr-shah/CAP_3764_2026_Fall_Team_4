@@ -1,0 +1,388 @@
+{
+  "source": {
+    "filename": "DataCoSupplyChainDataset.csv",
+    "size_bytes": 95729629,
+    "sha256": "994b3c8d24049cc46bf20e8161fedece9a9b95376cc0dc929921d76cf6b9bc0d",
+    "encoding": "latin-1"
+  },
+  "target": "late_delivery_risk",
+  "positive_class": 1,
+  "prediction_time": "order_placement",
+  "model_features": [
+    "days_for_shipment_scheduled",
+    "shipping_mode"
+  ],
+  "split": {
+    "manifest_sha256": "7fbeb2d5b8f8c4e439166adb9c9a6195b34b872361707cde1221667774d08aaa",
+    "partitions": {
+      "train": {
+        "rows": 118245,
+        "orders": 39451,
+        "first_order_timestamp": "2015-01-01T00:00:00",
+        "last_order_timestamp": "2016-11-21T09:32:00"
+      },
+      "validation": {
+        "rows": 39496,
+        "orders": 13150,
+        "first_order_timestamp": "2016-11-21T10:14:00",
+        "last_order_timestamp": "2017-07-09T22:53:00"
+      },
+      "test": {
+        "rows": 22778,
+        "orders": 13151,
+        "first_order_timestamp": "2017-07-09T23:14:00",
+        "last_order_timestamp": "2018-01-31T23:38:00"
+      }
+    },
+    "overlapping_order_counts": {
+      "train_validation": 0,
+      "train_test": 0,
+      "validation_test": 0
+    }
+  },
+  "reference_contracts_verified": true,
+  "primary_metric": "average_precision_from_late_class_probabilities",
+  "inner_cv": {
+    "method": "3 expanding folds over unique training timestamp cohorts",
+    "folds": [
+      {
+        "fold": 1,
+        "overlapping_orders": 0,
+        "fit": {
+          "items": 29527,
+          "orders": 9865,
+          "first_order_timestamp": "2015-01-01T00:00:00",
+          "last_order_timestamp": "2015-06-22T08:31:00"
+        },
+        "score": {
+          "items": 29621,
+          "orders": 9862,
+          "first_order_timestamp": "2015-06-22T08:52:00",
+          "last_order_timestamp": "2015-12-12T01:47:00"
+        }
+      },
+      {
+        "fold": 2,
+        "overlapping_orders": 0,
+        "fit": {
+          "items": 59148,
+          "orders": 19727,
+          "first_order_timestamp": "2015-01-01T00:00:00",
+          "last_order_timestamp": "2015-12-12T01:47:00"
+        },
+        "score": {
+          "items": 29405,
+          "orders": 9862,
+          "first_order_timestamp": "2015-12-12T02:08:00",
+          "last_order_timestamp": "2016-06-01T10:39:00"
+        }
+      },
+      {
+        "fold": 3,
+        "overlapping_orders": 0,
+        "fit": {
+          "items": 88553,
+          "orders": 29589,
+          "first_order_timestamp": "2015-01-01T00:00:00",
+          "last_order_timestamp": "2016-06-01T10:39:00"
+        },
+        "score": {
+          "items": 29692,
+          "orders": 9862,
+          "first_order_timestamp": "2016-06-01T11:00:00",
+          "last_order_timestamp": "2016-11-21T09:32:00"
+        }
+      }
+    ],
+    "mean_rule": "unweighted mean of per-item AP across folds"
+  },
+  "search_results": [
+    {
+      "model": "logistic_regression",
+      "selected_settings": {
+        "model__C": 0.1
+      },
+      "selected_cv_average_precision": 0.7547422260049369,
+      "refit_estimator_parameters": {
+        "C": 0.1,
+        "class_weight": null,
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": null,
+        "max_iter": 1000,
+        "multi_class": "deprecated",
+        "n_jobs": null,
+        "penalty": "l2",
+        "random_state": 42,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "configurations": [
+        {
+          "settings": {
+            "model__C": 0.1
+          },
+          "fold_average_precision": [
+            0.7617481307739926,
+            0.7495482005299781,
+            0.75293034671084
+          ],
+          "mean_average_precision": 0.7547422260049369,
+          "std_average_precision": 0.005142745986467283
+        },
+        {
+          "settings": {
+            "model__C": 1.0
+          },
+          "fold_average_precision": [
+            0.7617481307739926,
+            0.7495482005299781,
+            0.75293034671084
+          ],
+          "mean_average_precision": 0.7547422260049369,
+          "std_average_precision": 0.005142745986467283
+        }
+      ]
+    },
+    {
+      "model": "decision_tree",
+      "selected_settings": {
+        "model__max_depth": 3
+      },
+      "selected_cv_average_precision": 0.7547422260049369,
+      "refit_estimator_parameters": {
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 3,
+        "max_features": null,
+        "max_leaf_nodes": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "random_state": 42,
+        "splitter": "best"
+      },
+      "configurations": [
+        {
+          "settings": {
+            "model__max_depth": 1
+          },
+          "fold_average_precision": [
+            0.7007705646975219,
+            0.6922494989336814,
+            0.6911852163830421
+          ],
+          "mean_average_precision": 0.6947350933380818,
+          "std_average_precision": 0.00428978322955562
+        },
+        {
+          "settings": {
+            "model__max_depth": 3
+          },
+          "fold_average_precision": [
+            0.7617481307739926,
+            0.7495482005299781,
+            0.75293034671084
+          ],
+          "mean_average_precision": 0.7547422260049369,
+          "std_average_precision": 0.005142745986467283
+        }
+      ]
+    },
+    {
+      "model": "random_forest",
+      "selected_settings": {
+        "model__max_depth": 3
+      },
+      "selected_cv_average_precision": 0.7547422260049369,
+      "refit_estimator_parameters": {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 3,
+        "max_features": null,
+        "max_leaf_nodes": null,
+        "max_samples": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "n_estimators": 100,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 42,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "configurations": [
+        {
+          "settings": {
+            "model__max_depth": 2
+          },
+          "fold_average_precision": [
+            0.7617481307739926,
+            0.7246926138731165,
+            0.7221022405715736
+          ],
+          "mean_average_precision": 0.7361809950728943,
+          "std_average_precision": 0.018109598365307497
+        },
+        {
+          "settings": {
+            "model__max_depth": 3
+          },
+          "fold_average_precision": [
+            0.7617481307739926,
+            0.7495482005299781,
+            0.75293034671084
+          ],
+          "mean_average_precision": 0.7547422260049369,
+          "std_average_precision": 0.005142745986467283
+        }
+      ]
+    }
+  ],
+  "selection": {
+    "preferred_model_by_training_cv": "logistic_regression",
+    "tie_tolerance": 1e-12,
+    "tie_rule": "first declared grid setting; family order logistic, tree, forest",
+    "outer_validation_used_for_tuning": false
+  },
+  "validation_leaderboard": [
+    {
+      "model": "depth_3_tree",
+      "kind": "reference",
+      "validation_average_precision": 0.7420000295494212,
+      "inner_cv_average_precision": null,
+      "settings": {
+        "ccp_alpha": 0.0,
+        "class_weight": null,
+        "criterion": "gini",
+        "max_depth": 3,
+        "max_features": null,
+        "max_leaf_nodes": null,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 100,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "monotonic_cst": null,
+        "random_state": 42,
+        "splitter": "best"
+      },
+      "distinct_scores": 4,
+      "rank": 1,
+      "partition": "validation",
+      "unit": "order_item",
+      "gain_vs_always_late": 0.1973879169304218,
+      "gain_vs_depth_3_tree": 0.0
+    },
+    {
+      "model": "logistic_regression",
+      "kind": "tuned_candidate",
+      "validation_average_precision": 0.7420000295494212,
+      "inner_cv_average_precision": 0.7547422260049369,
+      "settings": {
+        "model__C": 0.1
+      },
+      "distinct_scores": 4,
+      "rank": 1,
+      "partition": "validation",
+      "unit": "order_item",
+      "gain_vs_always_late": 0.1973879169304218,
+      "gain_vs_depth_3_tree": 0.0
+    },
+    {
+      "model": "decision_tree",
+      "kind": "tuned_candidate",
+      "validation_average_precision": 0.7420000295494212,
+      "inner_cv_average_precision": 0.7547422260049369,
+      "settings": {
+        "model__max_depth": 3
+      },
+      "distinct_scores": 4,
+      "rank": 1,
+      "partition": "validation",
+      "unit": "order_item",
+      "gain_vs_always_late": 0.1973879169304218,
+      "gain_vs_depth_3_tree": 0.0
+    },
+    {
+      "model": "random_forest",
+      "kind": "tuned_candidate",
+      "validation_average_precision": 0.7420000295494212,
+      "inner_cv_average_precision": 0.7547422260049369,
+      "settings": {
+        "model__max_depth": 3
+      },
+      "distinct_scores": 4,
+      "rank": 1,
+      "partition": "validation",
+      "unit": "order_item",
+      "gain_vs_always_late": 0.1973879169304218,
+      "gain_vs_depth_3_tree": 0.0
+    },
+    {
+      "model": "always_predict_late",
+      "kind": "reference",
+      "validation_average_precision": 0.5446121126189994,
+      "inner_cv_average_precision": null,
+      "settings": {},
+      "distinct_scores": 1,
+      "rank": 5,
+      "partition": "validation",
+      "unit": "order_item",
+      "gain_vs_always_late": 0.0,
+      "gain_vs_depth_3_tree": -0.1973879169304218
+    }
+  ],
+  "training_shipping_profiles_and_candidate_probabilities": [
+    {
+      "days_for_shipment_scheduled": 0,
+      "shipping_mode": "Same Day",
+      "logistic_regression": 0.44267976646172963,
+      "decision_tree": 0.43953125,
+      "random_forest": 0.4389135569297347
+    },
+    {
+      "days_for_shipment_scheduled": 1,
+      "shipping_mode": "First Class",
+      "logistic_regression": 0.955626440120498,
+      "decision_tree": 0.9563050977385972,
+      "random_forest": 0.9566092175992873
+    },
+    {
+      "days_for_shipment_scheduled": 2,
+      "shipping_mode": "Second Class",
+      "logistic_regression": 0.7687136529881301,
+      "decision_tree": 0.7690353143841516,
+      "random_forest": 0.7691517111083693
+    },
+    {
+      "days_for_shipment_scheduled": 4,
+      "shipping_mode": "Standard Class",
+      "logistic_regression": 0.3815985720433584,
+      "decision_tree": 0.3814843239248458,
+      "random_forest": 0.3815877806254533
+    }
+  ],
+  "validation_shipping_profile_count": 4,
+  "preprocessing": "clone of shared tree preprocessing; fitted inside each fold and training-only refit",
+  "final_test_evaluated": false,
+  "operating_threshold": null,
+  "runtime": {
+    "python": "3.11.18",
+    "pandas": "2.2.3",
+    "numpy": "2.1.3",
+    "scikit_learn": "1.5.2",
+    "search_jobs": 1,
+    "fit_thread_limit": 1
+  }
+}
